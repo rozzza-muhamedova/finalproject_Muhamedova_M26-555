@@ -1,0 +1,16 @@
+[
+    {
+        "user_id": 1,
+        "username": "alice",
+        "hashed_password": "80fc8cba7e8c990a839b335db908bca44657895233ef2131d2e770c1f4d90ae3",
+        "salt": "48604",
+        "registration_date": "2026-11-03T21:21:38.670793"
+    },
+    {
+        "user_id": 2,
+        "username": "bob",
+        "hashed_password": "c41f72317acf5de0ef1cf1f605dab4217d15e27891b24a6a3e1775f4cf54d465",
+        "salt": "91283",
+        "registration_date": "2026-11-03T21:21:59.929160"
+    }
+]

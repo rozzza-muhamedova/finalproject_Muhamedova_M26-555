@@ -1,5 +1,6 @@
 import hashlib
 import random
+from datetime import datetime
 
 
 class User:
@@ -9,6 +10,11 @@ class User:
         self.username = username
         self._salt = str(random.randint(10000, 99999))
         self.password = password
+        self._registration_date = datetime.now()
+
+    @property
+    def user_id(self):
+        return self._user_id
         
     @property
     def username(self):
@@ -20,6 +26,11 @@ class User:
             raise ValueError('Имя не может быть пустым')
         else:
             self._username = username
+    
+    @property
+    def salt(self):
+        """Геттер для соли."""
+        return self._salt
 
     @property
     def password(self):
@@ -28,9 +39,13 @@ class User:
     @password.setter
     def password(self, password: str):
         if len(password) < 4:
-            raise ValueError('Пароль должен содержать более 4 символов')
+            raise ValueError('Пароль должен быть не короче 4 символов')
         else:
             self._hashed_password = hashlib.sha256((password + self._salt).encode('utf-8')).hexdigest()
+    
+    @property
+    def registration_date(self):
+        return self._registration_date
     
     def verify_password(self, password: str) -> bool:
         input_password = hashlib.sha256((password + self._salt).encode('utf-8')).hexdigest()
@@ -57,10 +72,10 @@ class Wallet:
 
     @balance.setter
     def balance(self, amount):
-        if amount < 0:
+        if not isinstance(amount, (int, float)):
+            raise TypeError('Некорректный тип данных')
+        elif amount < 0:
             raise ValueError('Отрицательное значение запрещено')
-        elif not isinstance(amount, (int, float)):
-            raise ValueError('Некорректный тип данных')
         else:
             self._balance = amount
 
@@ -71,14 +86,14 @@ class Wallet:
 
     def withdraw(self, amount: float):
         if amount <= 0:
-            raise ValueError("Сумма пополнения должна быть больше нуля")
+            raise ValueError("Сумма снятия должна быть больше нуля")
         if self.balance >= amount:
             self.balance -= amount
         else:
             raise ValueError("На текущем балансе недостаточно средств")
 
     def get_balance_info(self):
-        return f'Текущий баланс {self._balance}'
+        return f'{self.currency_code}: {self.balance:.4f}'
 
 class Portfolio:
     """Класс Portfolio (управление всеми кошельками одного пользователя)."""
@@ -121,15 +136,3 @@ class Portfolio:
                 total_value += wallet.balance * exchange_rates[code]
         
         return total_value
-    
-
-
-
-
-    
-
-
-
-
-
-    

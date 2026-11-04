@@ -111,17 +111,17 @@ def show_portfolio(base: str = 'USD'):
 
     currency = base.upper()
 
-    print(f"Портфель пользователя '{current_user['username']}' (база: {base})")
+    print(f"Портфель пользователя '{current_user['username']}' (база: {currency})")
     total_sum = 0
         
     for currency in current_user_portfolio["wallets"]:
         current_user_portfolio_wallet_currency_balance = current_user_portfolio["wallets"][currency]["balance"]
         exchange_rate = EXCHANGE_RATES.get(f"{currency}_USD", 0)
         print(f'- {currency}: {current_user_portfolio_wallet_currency_balance} ->  '
-              f'{current_user_portfolio_wallet_currency_balance * exchange_rate:.2f} {base}')
+              f'{current_user_portfolio_wallet_currency_balance * exchange_rate:.2f} {base.upper()}')
         total_sum += current_user_portfolio_wallet_currency_balance * exchange_rate
     print('---------------------------------')
-    print(f'ИТОГО: {total_sum:.2f} {base}')
+    print(f'ИТОГО: {total_sum:.2f} {base.upper()}')
 
 def buy(currency: str, amount: float):
     """Купить валюту."""

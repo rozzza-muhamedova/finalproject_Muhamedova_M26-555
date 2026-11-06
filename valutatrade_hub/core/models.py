@@ -5,6 +5,7 @@ from datetime import datetime
 
 class User:
     """Класс User (пользователь системы)."""
+
     def __init__(self, user_id: int, username: str, password: str):
         self._user_id = user_id
         self.username = username
@@ -15,18 +16,18 @@ class User:
     @property
     def user_id(self):
         return self._user_id
-        
+
     @property
     def username(self):
         return self._username
 
     @username.setter
     def username(self, username: str):
-        if username == '':
-            raise ValueError('Имя не может быть пустым')
+        if username == "":
+            raise ValueError("Имя не может быть пустым")
         else:
             self._username = username
-    
+
     @property
     def salt(self):
         """Геттер для соли."""
@@ -39,28 +40,35 @@ class User:
     @password.setter
     def password(self, password: str):
         if len(password) < 4:
-            raise ValueError('Пароль должен быть не короче 4 символов')
+            raise ValueError("Пароль должен быть не короче 4 символов")
         else:
-            self._hashed_password = hashlib.sha256((password + self._salt).encode('utf-8')).hexdigest()
-    
+            self._hashed_password = hashlib.sha256(
+                (password + self._salt).encode("utf-8")
+            ).hexdigest()
+
     @property
     def registration_date(self):
         return self._registration_date
-    
+
     def verify_password(self, password: str) -> bool:
-        input_password = hashlib.sha256((password + self._salt).encode('utf-8')).hexdigest()
+        input_password = hashlib.sha256(
+            (password + self._salt).encode("utf-8")
+        ).hexdigest()
         return input_password == self._hashed_password
-    
+
     def change_password(self, new_password: str):
         self.password = new_password
 
     def get_user_info(self):
-        return (f'Информация о пользователе с user_id: {self._user_id}\n'
-               f'Имя пользователя: {self._username}')
+        return (
+            f"Информация о пользователе с user_id: {self._user_id}\n"
+            f"Имя пользователя: {self._username}"
+        )
 
-    
+
 class Wallet:
     """Класс Wallet (кошелёк пользователя для одной конкретной валюты)."""
+
     def __init__(self, currency_code: str, balance: float = 0.0):
         self.currency_code = currency_code.upper()
         self._balance = 0.0
@@ -73,9 +81,9 @@ class Wallet:
     @balance.setter
     def balance(self, amount):
         if not isinstance(amount, (int, float)):
-            raise TypeError('Некорректный тип данных')
+            raise TypeError("Некорректный тип данных")
         elif amount < 0:
-            raise ValueError('Отрицательное значение запрещено')
+            raise ValueError("Отрицательное значение запрещено")
         else:
             self._balance = amount
 
@@ -93,10 +101,12 @@ class Wallet:
             raise ValueError("На текущем балансе недостаточно средств")
 
     def get_balance_info(self):
-        return f'{self.currency_code}: {self.balance:.4f}'
+        return f"{self.currency_code}: {self.balance:.4f}"
+
 
 class Portfolio:
     """Класс Portfolio (управление всеми кошельками одного пользователя)."""
+
     def __init__(self, user_id: int):
         self._user_id = user_id
         self._wallets = {}
@@ -114,25 +124,25 @@ class Portfolio:
             raise ValueError(f"Кошелёк для {currency_code} уже существует")
         else:
             self._wallets[currency_code] = Wallet(currency_code)
-    
+
     def get_wallet(self, currency_code):
         if currency_code not in self._wallets:
             raise ValueError(f"Кошелёка для {currency_code} не существует")
         else:
             return self._wallets[currency_code]
-    
-    def get_total_value(self, base_currency='USD'):
+
+    def get_total_value(self, base_currency="USD"):
         exchange_rates = {
-            'USD': 1.0,
-            'EUR': 1.07,
-            'BTC': 59337.21,
-            'ETH': 3720.00,
-            'RUB': 0.01016,
+            "USD": 1.0,
+            "EUR": 1.07,
+            "BTC": 59337.21,
+            "ETH": 3720.00,
+            "RUB": 0.01016,
         }
-        
+
         total_value = 0.0
         for code, wallet in self._wallets.items():
             if code in exchange_rates:
                 total_value += wallet.balance * exchange_rates[code]
-        
+
         return total_value

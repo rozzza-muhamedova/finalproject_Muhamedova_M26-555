@@ -19,5 +19,12 @@
         "hashed_password": "5caa94e51fbc2b93cdec8810c51c0c81689aa749f74bdaf032c4e708ae5f4235",
         "salt": "56904",
         "registration_date": "2026-11-04T15:38:03.605853"
+    },
+    {
+        "user_id": 4,
+        "username": "roza",
+        "hashed_password": "96a54296acdbbb7d7c0f2e03a13d691a866b7c81d3fff782f2ee069052eceeb4",
+        "salt": "65897",
+        "registration_date": "2026-11-05T09:20:09.303276"
     }
 ]

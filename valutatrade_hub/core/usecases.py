@@ -8,10 +8,14 @@ from valutatrade_hub.core.exceptions import (
     InsufficientFundsError,
 )
 from valutatrade_hub.core.models import User
+from valutatrade_hub.infra.settings import SettingsLoader
 
 current_user = None
 
-DATA_DIR = "data"
+# Singleton: единая точка настроек (используется для путей к данным)
+settings = SettingsLoader()
+# Используем Singleton для получения пути к данным
+DATA_DIR = settings.data_dir
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 PORTFOLIOS_FILE = os.path.join(DATA_DIR, "portfolios.json")
 EXCHANGE_RATES = {

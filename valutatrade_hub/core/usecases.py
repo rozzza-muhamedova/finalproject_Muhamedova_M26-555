@@ -8,6 +8,7 @@ from valutatrade_hub.core.exceptions import (
     InsufficientFundsError,
 )
 from valutatrade_hub.core.models import User
+from valutatrade_hub.decorators import log_action
 from valutatrade_hub.infra.settings import SettingsLoader
 
 current_user = None
@@ -145,7 +146,7 @@ def show_portfolio(base: str = "USD"):
     print("---------------------------------")
     print(f"ИТОГО: {total_sum:,.2f} {base.upper()}")
 
-
+@log_action
 def buy(currency: str, amount: float):
     """Купить валюту."""
     if current_user is None:
@@ -192,11 +193,11 @@ def buy(currency: str, amount: float):
     )
     print("Изменения в портфеле:")
     print(
-        f"- {currency}: было {current_user_portfolio_balance_before} → стало {current_user_portfolio_balance_after}"
+        f"- {currency}: было {current_user_portfolio_balance_before:.4f} → стало {current_user_portfolio_balance_after:.4f}"
     )
     print(f"Оценочная стоимость покупки: {exchange_rate * amount:.2f} USD")
 
-
+@log_action
 def sell(currency: str, amount: float):
     """Продать валюту."""
     portfolios = load_json(PORTFOLIOS_FILE)
@@ -230,7 +231,7 @@ def sell(currency: str, amount: float):
             current_user_portfolio["wallets"][currency]["balance"] -= amount
         else:
             raise InsufficientFundsError(
-                f"Недостаточно средств: доступно {current_user_portfolio_balance_before} {currency}, "
+                f"Недостаточно средств: доступно {current_user_portfolio_balance_before:.4f} {currency}, "
                 f"требуется {amount} {currency}"
             )
     else:
@@ -251,10 +252,9 @@ def sell(currency: str, amount: float):
     )
     print("Изменения в портфеле:")
     print(
-        f"- {currency}: было {current_user_portfolio_balance_before} → стало {current_user_portfolio_balance_after}"
+        f"- {currency}: было {current_user_portfolio_balance_before:.4f} → стало {current_user_portfolio_balance_after:.4f}"
     )
     print(f"Оценочная выручка: {exchange_rate * amount:.2f} USD")
-
 
 def get_rate(from_: str, to_: str):
     """Получить текущий курс одной валюты к другой."""

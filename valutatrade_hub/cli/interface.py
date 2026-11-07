@@ -1,6 +1,7 @@
 import shlex
 
 from valutatrade_hub.core.exceptions import (
+    ApiRequestError,
     CurrencyNotFoundError,
     InsufficientFundsError,
 )
@@ -12,6 +13,7 @@ from valutatrade_hub.core.usecases import (
     sell,
     show_portfolio,
 )
+from valutatrade_hub.parser_service.updater import RatesUpdater
 
 
 def run_cli():
@@ -129,6 +131,15 @@ def run_cli():
                 print(f"Ошибка при получении курса: {e}. Проверьте коды валют.")
             except ValueError as e:
                 print(f"Ошибка при получении курса: {e}.")
+        
+        elif command == "update-rates":
+            try:
+                updater = RatesUpdater()
+                updater.run_update()
+            except ApiRequestError as e:
+                print(f"Ошибка API: {e}")
+            except (OSError, ValueError) as e:
+                print(f"Ошибка при обновлении курса валют: {e}")
 
         elif command == "exit":
             break

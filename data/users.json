@@ -1,30 +1,16 @@
 [
     {
         "user_id": 1,
-        "username": "alice",
-        "hashed_password": "80fc8cba7e8c990a839b335db908bca44657895233ef2131d2e770c1f4d90ae3",
-        "salt": "48604",
-        "registration_date": "2026-11-03T21:21:38.670793"
+        "username": "roza",
+        "hashed_password": "e3abb3743b3b13bc3988b7c0fd3140b9133c4cb8b74e2ea89835018e8a7a8540",
+        "salt": "57008",
+        "registration_date": "2026-11-07T19:05:37.414690"
     },
     {
         "user_id": 2,
-        "username": "bob",
-        "hashed_password": "c41f72317acf5de0ef1cf1f605dab4217d15e27891b24a6a3e1775f4cf54d465",
-        "salt": "91283",
-        "registration_date": "2026-11-03T21:21:59.929160"
-    },
-    {
-        "user_id": 3,
-        "username": "mike",
-        "hashed_password": "5caa94e51fbc2b93cdec8810c51c0c81689aa749f74bdaf032c4e708ae5f4235",
-        "salt": "56904",
-        "registration_date": "2026-11-04T15:38:03.605853"
-    },
-    {
-        "user_id": 4,
-        "username": "roza",
-        "hashed_password": "96a54296acdbbb7d7c0f2e03a13d691a866b7c81d3fff782f2ee069052eceeb4",
-        "salt": "65897",
-        "registration_date": "2026-11-05T09:20:09.303276"
+        "username": "anna",
+        "hashed_password": "597b2e28d170a9c0984cd47f7d33c0b7b9b396c7ee18155d95408d13567e9c59",
+        "salt": "13110",
+        "registration_date": "2026-11-07T19:08:15.587108"
     }
 ]

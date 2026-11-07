@@ -52,6 +52,22 @@ def save_json(filepath, data):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
+def _get_exchange_rate(currency: str) -> float:
+    """Возвращает курс валюты к USD. Сначала ищет в кеше парсера, потом в заглушке."""
+    pair = f"{currency.upper()}_USD"
+    
+    try:
+        with open("data/rates.json", "r", encoding="utf-8") as f:
+            cache = json.load(f)
+            rates = cache.get("pairs", {})
+            if pair in rates:
+                return rates[pair]
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+        
+    return EXCHANGE_RATES.get(pair, 0)
+
+
 # бизнес-функции
 def register(username: str, password: str):
     """Cоздать нового пользователя."""
@@ -137,9 +153,11 @@ def show_portfolio(base: str = "USD"):
         current_user_portfolio_wallet_currency_balance = current_user_portfolio[
             "wallets"
         ][currency]["balance"]
-        exchange_rate = EXCHANGE_RATES.get(f"{currency}_USD", 0)
+
+        exchange_rate = _get_exchange_rate(currency)
+        
         print(
-            f"- {currency}: {current_user_portfolio_wallet_currency_balance} →  "
+            f"- {currency}: {current_user_portfolio_wallet_currency_balance:.4f} →  "
             f"{current_user_portfolio_wallet_currency_balance * exchange_rate:.2f} {base.upper()}"
         )
         total_sum += current_user_portfolio_wallet_currency_balance * exchange_rate
@@ -187,7 +205,8 @@ def buy(currency: str, amount: float):
 
     save_json(PORTFOLIOS_FILE, portfolios)
 
-    exchange_rate = EXCHANGE_RATES.get(f"{currency}_USD", 0)
+    exchange_rate = _get_exchange_rate(currency)
+    
     print(
         f"Покупка выполнена: {amount} {currency} по курсу {exchange_rate} USD/{currency}"
     )
@@ -246,7 +265,8 @@ def sell(currency: str, amount: float):
 
     save_json(PORTFOLIOS_FILE, portfolios)
 
-    exchange_rate = EXCHANGE_RATES.get(f"{currency}_USD", 0)
+    exchange_rate = _get_exchange_rate(currency)
+    
     print(
         f"Продажа выполнена: {amount} {currency} по курсу {exchange_rate} USD/{currency}"
     )
@@ -256,24 +276,48 @@ def sell(currency: str, amount: float):
     )
     print(f"Оценочная выручка: {exchange_rate * amount:.2f} USD")
 
+
 def get_rate(from_: str, to_: str):
-    """Получить текущий курс одной валюты к другой."""
+    """Получить текущий курс одной валюты к другой (из локального кеша)."""
     get_currency(from_)
     get_currency(to_)
 
+    from_ = from_.upper()
+    to_ = to_.upper()
     pair = f"{from_}_{to_}"
     reverse_pair = f"{to_}_{from_}"
 
-    if pair in EXCHANGE_RATES:
-        rate = EXCHANGE_RATES[pair]
-        print(f"Курс {pair}: {rate} (обновлено: {datetime.now()})")
-        print(f"Обратный курс {reverse_pair}: {1 / EXCHANGE_RATES[pair]:.8f}")
+    try:
+        with open("data/rates.json", "r", encoding="utf-8") as f:
+            cache = json.load(f)
+    except FileNotFoundError:
+        print("Локальный кеш курсов пуст. Выполните 'update-rates', чтобы загрузить данные.")
         return
 
-    if reverse_pair in EXCHANGE_RATES:
-        rate = 1 / EXCHANGE_RATES[reverse_pair]
-        print(f"Курс {pair}: {rate:.8f} (обновлено: {datetime.now()})")
-        print(f"Обратный курс {reverse_pair}: {EXCHANGE_RATES[reverse_pair]}")
+    last_refresh_str = cache.get("last_refresh")
+    if not last_refresh_str:
+        print("В кеше нет метки времени. Выполните 'update-rates'.")
+        return
+        
+    last_refresh = datetime.fromisoformat(last_refresh_str)
+    time_passed = (datetime.now() - last_refresh).total_seconds()
+
+    if time_passed > settings.rates_ttl:
+        print(f"Курсы устарели (обновлены {int(time_passed)} сек. назад). Выполните 'update-rates' для обновления.")
+        return
+
+    rates = cache.get("pairs", {})
+    
+    if pair in rates:
+        rate = rates[pair]
+        print(f"Курс {pair}: {rate} из кеша (обновлено: {last_refresh_str})")
+        print(f"Обратный курс {reverse_pair}: {1 / rate:.8f}")
+        return
+        
+    if reverse_pair in rates:
+        rate = 1 / rates[reverse_pair]
+        print(f"Курс {pair}: {rate:.8f} из кеша, рассчитаный из обратного (обновлено: {last_refresh_str})")
+        print(f"Обратный курс {reverse_pair}: {rates[reverse_pair]} из кеша")
         return
 
     print(f"Курс {pair} недоступен. Повторите попытку позже.")
